@@ -39,7 +39,7 @@ function Toggle({ label, checked, onChange }) {
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative w-10 h-6 rounded-full transition-colors ${
-          checked ? 'bg-[#84a98c]' : 'bg-black/15 dark:bg-white/15'
+          checked ? 'bg-[#52796f]' : 'bg-black/15 dark:bg-white/15'
         }`}
       >
         <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
@@ -79,14 +79,14 @@ export function Settings({ settings, update, onClose }) {
       <SectionLabel>Settings</SectionLabel>
 
       <div className="flex flex-col gap-1">
-        <p className="text-xs text-[#888] dark:text-[#aaa] mb-1">Duration (minutes)</p>
+        <p className="text-xs text-[#666] dark:text-[#aaa] mb-1">Duration (minutes)</p>
         <DurationField label="Pomodoro" value={draft.pomodoro} onChange={v => set('pomodoro', v)} />
         <DurationField label="Short Break" value={draft.shortBreak} onChange={v => set('shortBreak', v)} max={60} />
         <DurationField label="Long Break" value={draft.longBreak} onChange={v => set('longBreak', v)} />
       </div>
 
       <div className="flex flex-col gap-1">
-        <p className="text-xs text-[#888] dark:text-[#aaa] mb-1">Behavior</p>
+        <p className="text-xs text-[#666] dark:text-[#aaa] mb-1">Behavior</p>
         <Toggle label="Auto-start next session" checked={draft.autoStart} onChange={v => set('autoStart', v)} />
         <Toggle label="Browser notifications" checked={draft.notifications} onChange={handleNotificationsToggle} />
       </div>

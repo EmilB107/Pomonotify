@@ -150,7 +150,7 @@ export function SpotifyPlayer() {
           <div className="flex gap-2 px-3 pb-3 sm:px-5">
             <input
               autoFocus
-              className="flex-1 min-w-0 text-sm bg-transparent border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 outline-none"
+              className="flex-1 min-w-0 text-sm bg-transparent border border-black/10 dark:border-white/10 rounded-xl px-3 py-2 outline-none placeholder:text-[#666] dark:placeholder:text-[#aaa]"
               placeholder="Spotify playlist or artist URL"
               value={url}
               onChange={e => setUrl(e.target.value)}
@@ -172,6 +172,7 @@ export function SpotifyPlayer() {
         {selected ? (
           <iframe
             key={selected.id}
+            title={`Spotify — ${selected.name ?? 'player'}`}
             src={`https://open.spotify.com/embed/${selected.type}/${selected.id}?theme=0`}
             width="100%"
             height="400"

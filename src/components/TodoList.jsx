@@ -21,7 +21,7 @@ function DragHandle({ listeners, attributes }) {
   return (
     <button
       type="button"
-      className="touch-none cursor-grab active:cursor-grabbing text-[#ccc] dark:text-[#666] hover:text-[#888] dark:hover:text-[#aaa] transition-colors flex-shrink-0"
+      className="touch-none cursor-grab active:cursor-grabbing text-[#888] dark:text-[#666] hover:text-[#666] dark:hover:text-[#aaa] transition-colors flex-shrink-0"
       {...listeners}
       {...attributes}
       aria-label="Drag to reorder"
@@ -79,7 +79,7 @@ function SortableItem({ todo, activeTask, setActiveTask, onToggle, deleteMode, s
           type="button"
           onClick={e => { e.stopPropagation(); onToggle(todo.id) }}
           className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors cursor-pointer ${
-            todo.completed ? 'bg-[#84a98c] border-[#84a98c]' : 'border-black/20 dark:border-white/20 hover:border-[#84a98c]'
+            todo.completed ? 'bg-[#52796f] border-[#52796f]' : 'border-black/20 dark:border-white/20 hover:border-[#52796f]'
           }`}
         >
           {todo.completed && (
@@ -94,9 +94,9 @@ function SortableItem({ todo, activeTask, setActiveTask, onToggle, deleteMode, s
         deleteMode
           ? selected.has(todo.id) ? 'text-red-400' : 'text-[#1a1a1a] dark:text-[#e8e8e8]'
           : todo.completed
-            ? 'line-through text-[#888] dark:text-[#777]'
+            ? 'line-through text-[#666] dark:text-[#777]'
             : activeTask === todo.id
-              ? 'text-[#84a98c] font-medium'
+              ? 'text-[#52796f] dark:text-[#84a98c] font-medium'
               : 'text-[#1a1a1a] dark:text-[#e8e8e8]'
       }`}>
         {todo.text}
@@ -190,7 +190,7 @@ export function TodoList({ todos, activeTask, setActiveTask, addTodo, toggleTodo
             <button
               type="button"
               onClick={clearCompleted}
-              className="text-xs text-[#888] dark:text-[#aaa] hover:text-red-400 dark:hover:text-red-400 transition-colors"
+              className="text-xs text-[#666] dark:text-[#aaa] hover:text-red-400 dark:hover:text-red-400 transition-colors"
             >
               Clear done
             </button>
@@ -202,7 +202,7 @@ export function TodoList({ todos, activeTask, setActiveTask, addTodo, toggleTodo
             <button
               type="button"
               onClick={toggleSelectAll}
-              className="text-xs text-[#888] dark:text-[#aaa] hover:text-[#84a98c] transition-colors"
+              className="text-xs text-[#666] dark:text-[#aaa] hover:text-[#52796f] dark:hover:text-[#84a98c] transition-colors"
             >
               {allSelected ? 'Deselect all' : 'Select all'}
             </button>
@@ -234,7 +234,7 @@ export function TodoList({ todos, activeTask, setActiveTask, addTodo, toggleTodo
         <div className="flex flex-col gap-2">
           <input
             autoFocus
-            className="w-full text-sm bg-black/5 dark:bg-white/5 rounded-2xl px-4 py-3 outline-none placeholder:text-[#888] focus:ring-1 focus:ring-[#84a98c] transition-all"
+            className="w-full text-sm bg-black/5 dark:bg-white/5 rounded-2xl px-4 py-3 outline-none placeholder:text-[#666] dark:placeholder:text-[#aaa] focus:ring-1 focus:ring-[#52796f] dark:focus:ring-[#84a98c] transition-all"
             placeholder="Add a task..."
             value={input}
             onChange={e => setInput(e.target.value)}
@@ -252,7 +252,7 @@ export function TodoList({ todos, activeTask, setActiveTask, addTodo, toggleTodo
       )}
 
       {todos.length === 0 ? (
-        <p className="text-sm text-center text-[#888] dark:text-[#aaa] py-4">No tasks yet</p>
+        <p className="text-sm text-center text-[#666] dark:text-[#aaa] py-4">No tasks yet</p>
       ) : (
         <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
           <SortableContext items={displayTodos.map(t => t.id)} strategy={verticalListSortingStrategy}>

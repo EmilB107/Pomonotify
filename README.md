@@ -12,7 +12,8 @@ A minimal Pomodoro timer with task management and Spotify integration.
 - **Settings** — customize session durations, auto-start, and notifications
 - **Keyboard shortcuts** — control everything without touching the mouse
 - **Dark / light theme** — persisted across sessions
-- **Accessible** — keyboard navigable, focus-trapped modals, screen reader announcements on session change
+- **Accessible** — WCAG AA compliant, keyboard navigable, focus-trapped modals, screen reader announcements on session change
+- **Installable (PWA)** — add to home screen on mobile or install from desktop browser; works offline via service worker
 - **Responsive** — works on mobile and desktop
 
 ## Keyboard Shortcuts
@@ -34,6 +35,7 @@ A minimal Pomodoro timer with task management and Spotify integration.
 - Spotify oEmbed API — fetch playlist names without auth
 - Web Audio API — session end alarm
 - `localStorage` — persist todos, settings, Spotify items, and theme
+- Service Worker — offline support via stale-while-revalidate caching
 
 ## Getting Started
 

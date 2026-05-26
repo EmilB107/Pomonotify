@@ -50,8 +50,8 @@ function ShortcutsModal({ onClose }) {
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr>
-            <th className="text-left pb-2 font-medium text-[#888] dark:text-[#aaa]">Key</th>
-            <th className="text-left pb-2 font-medium text-[#888] dark:text-[#aaa]">Action</th>
+            <th className="text-left pb-2 font-medium text-[#666] dark:text-[#aaa]">Key</th>
+            <th className="text-left pb-2 font-medium text-[#666] dark:text-[#aaa]">Action</th>
           </tr>
         </thead>
         <tbody>
@@ -157,7 +157,7 @@ function App() {
       <div className="min-h-screen bg-[#f5f5f0] dark:bg-[#1a1a1a] text-[#1a1a1a] dark:text-[#e8e8e8] transition-colors duration-300 flex flex-col justify-center items-center">
 
         {/* Centered container */}
-        <div className="w-full max-w-3xl px-4 sm:px-6">
+        <main className="w-full max-w-3xl px-4 sm:px-6">
 
           {/* Timer section */}
           <section className="flex flex-col items-center gap-6 py-12 sm:py-16">
@@ -213,7 +213,7 @@ function App() {
             {/* Session counter — hidden during breaks */}
             {sessionType === 'pomodoro' && (
               <div className="flex items-center gap-2">
-                <p className="text-base text-[#888] dark:text-[#aaa]">
+                <p className="text-base text-[#666] dark:text-[#aaa]">
                   Pomodoro {(pomodoroCount % 4) + 1}/4
                 </p>
                 {pomodoroCount > 0 && (
@@ -222,7 +222,7 @@ function App() {
                     onClick={resetCycle}
                     aria-label="Reset cycle"
                     title="Reset cycle"
-                    className="text-[#888] dark:text-[#aaa] hover:text-[#84a98c] transition-colors"
+                    className="text-[#666] dark:text-[#aaa] hover:text-[#52796f] dark:hover:text-[#84a98c] transition-colors"
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
@@ -251,8 +251,8 @@ function App() {
 
             {/* Active task */}
             {activeTaskText && (
-              <p className="text-base text-[#888] dark:text-[#aaa]">
-                Working on: <span className="text-[#84a98c] font-medium">{activeTaskText}</span>
+              <p className="text-base text-[#666] dark:text-[#aaa]">
+                Working on: <span className="text-[#52796f] dark:text-[#84a98c] font-medium">{activeTaskText}</span>
               </p>
             )}
 
@@ -275,7 +275,7 @@ function App() {
             <SpotifyPlayer />
           </section>
 
-        </div>
+        </main>
       </div>
 
       {showSettings && (

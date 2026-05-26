@@ -5,8 +5,8 @@ export const Button = forwardRef(function Button({ variant = 'ghost', size = 'md
 
   const variantClass =
     variant === 'primary'
-      ? 'bg-[#84a98c] hover:bg-[#6b9474] text-white font-semibold'
-      : 'text-[#888888] dark:text-[#aaaaaa] hover:bg-black/5 dark:hover:bg-white/5'
+      ? 'bg-[#52796f] hover:bg-[#3f6256] text-white font-semibold'
+      : 'text-[#666666] dark:text-[#aaaaaa] hover:bg-black/5 dark:hover:bg-white/5'
 
   const sizeClass =
     size === 'lg'   ? 'px-12 py-4 text-lg min-h-14' :
@@ -37,7 +37,7 @@ export function AddButton(props) {
 
 export function SectionLabel({ children, className = '' }) {
   return (
-    <span className={`text-xs font-semibold tracking-widest text-[#888] dark:text-[#aaa] uppercase ${className}`}>
+    <span className={`text-xs font-semibold tracking-widest text-[#666] dark:text-[#aaa] uppercase ${className}`}>
       {children}
     </span>
   )
