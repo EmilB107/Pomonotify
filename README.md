@@ -1,16 +1,49 @@
-# React + Vite
+# Pomonotify
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A minimal Pomodoro timer with task management and Spotify integration.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- **Pomodoro timer** — 25/5/15 minute sessions with a circular progress ring; reset the 4-session cycle at any time
+- **Auto-advance** — automatically moves Pomodoro → Short Break → Long Break (every 4th cycle) → Pomodoro
+- **Sound & notifications** — audio alarm and browser notifications on session end
+- **Task list** — add, complete, reorder (drag), delete, and clear completed tasks; mark one as the active focus
+- **Spotify player** — embed any Spotify playlist or artist, add/remove entries, persisted across sessions
+- **Settings** — customize session durations, auto-start, and notifications
+- **Keyboard shortcuts** — control everything without touching the mouse
+- **Dark / light theme** — persisted across sessions
+- **Accessible** — keyboard navigable, focus-trapped modals, screen reader announcements on session change
+- **Responsive** — works on mobile and desktop
 
-## React Compiler
+## Keyboard Shortcuts
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Key | Action |
+|-----|--------|
+| `Space` | Start / Pause |
+| `1` | Switch to Pomodoro |
+| `2` | Switch to Short Break |
+| `3` | Switch to Long Break |
+| `T` | Add new task |
+| `S` | Open / Close Settings |
 
-## Expanding the ESLint configuration
+## Tech Stack
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+- [React 19](https://react.dev) + [Vite](https://vitejs.dev)
+- [Tailwind CSS v4](https://tailwindcss.com)
+- [@dnd-kit](https://dndkit.com) — drag-to-reorder tasks (touch-friendly)
+- Spotify oEmbed API — fetch playlist names without auth
+- Web Audio API — session end alarm
+- `localStorage` — persist todos, settings, Spotify items, and theme
+
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
