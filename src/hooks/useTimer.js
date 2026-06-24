@@ -20,11 +20,13 @@ export function useTimer(settings, onSessionEnd) {
   const settingsRef = useRef(settings)
   const isRunningRef = useRef(isRunning)
   const onSessionEndRef = useRef(onSessionEnd)
+  const pomodoroCountRef = useRef(pomodoroCount)
 
   useEffect(() => { sessionTypeRef.current = sessionType }, [sessionType])
   useEffect(() => { settingsRef.current = settings }, [settings])
   useEffect(() => { isRunningRef.current = isRunning }, [isRunning])
   useEffect(() => { onSessionEndRef.current = onSessionEnd }, [onSessionEnd])
+  useEffect(() => { pomodoroCountRef.current = pomodoroCount }, [pomodoroCount])
 
   // Reset current session when its duration changes (only if not running)
   useEffect(() => {
@@ -61,16 +63,14 @@ export function useTimer(settings, onSessionEnd) {
     new Audio('/sounds/beep.mp3').play().catch(() => {})
     onSessionEndRef.current?.(currentSession)
 
-    setPomodoroCount(prev => {
-      const next = currentSession === 'pomodoro' ? prev + 1 : prev
-      const nextSession = currentSession === 'pomodoro'
-        ? (next % 4 === 0 ? 'longBreak' : 'shortBreak')
-        : 'pomodoro'
-      setSessionType(nextSession)
-      setTimeLeft(toSeconds(s)[nextSession])
-      if (s.autoStart) setIsRunning(true)
-      return next
-    })
+    const nextCount = currentSession === 'pomodoro' ? pomodoroCountRef.current + 1 : pomodoroCountRef.current
+    const nextSession = currentSession === 'pomodoro'
+      ? (nextCount % 4 === 0 ? 'longBreak' : 'shortBreak')
+      : 'pomodoro'
+    setPomodoroCount(nextCount)
+    setSessionType(nextSession)
+    setTimeLeft(toSeconds(s)[nextSession])
+    if (s.autoStart) setIsRunning(true)
   }, [timeLeft])
 
   function switchSession(type) {
