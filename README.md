@@ -5,13 +5,16 @@ A minimal Pomodoro timer with task management and Spotify integration.
 ## Features
 
 - **Pomodoro timer** — 25/5/15 minute sessions with a circular progress ring; reset the 4-session cycle at any time
+- **Custom timer** — pick a preset (10 seconds to 8 hours) or set any hours/minutes/seconds
 - **Auto-advance** — automatically moves Pomodoro → Short Break → Long Break (every 4th cycle) → Pomodoro
+- **Accurate in background tabs** — counts down against a fixed end time, so browser throttling doesn't slow it down
 - **Sound & notifications** — audio alarm and browser notifications on session end
 - **Task list** — add, complete, reorder (drag), delete, and clear completed tasks; mark one as the active focus
 - **Spotify player** — embed any Spotify playlist or artist, add/remove entries, persisted across sessions
 - **Settings** — customize session durations, auto-start, and notifications
 - **Keyboard shortcuts** — control everything without touching the mouse
 - **Dark / light theme** — persisted across sessions
+- **Weather-reactive theme** (opt-in) — accent colors and animated backgrounds (rain, snow, fog, stars, sun, lightning) follow the current weather at your location or a chosen city; dark mode can follow day/night
 - **Accessible** — WCAG AA compliant, keyboard navigable, focus-trapped modals, screen reader announcements on session change
 - **Installable (PWA)** — add to home screen on mobile or install from desktop browser; works offline via service worker
 - **Responsive** — works on mobile and desktop
@@ -24,6 +27,8 @@ A minimal Pomodoro timer with task management and Spotify integration.
 | `1` | Switch to Pomodoro |
 | `2` | Switch to Short Break |
 | `3` | Switch to Long Break |
+| `4` | Custom timer (press again to show/hide presets) |
+| `Esc` | Close custom timer presets |
 | `T` | Add new task |
 | `S` | Open / Close Settings |
 
@@ -33,8 +38,10 @@ A minimal Pomodoro timer with task management and Spotify integration.
 - [Tailwind CSS v4](https://tailwindcss.com)
 - [@dnd-kit](https://dndkit.com) — drag-to-reorder tasks (touch-friendly)
 - Spotify oEmbed API — fetch playlist names without auth
+- [Open-Meteo](https://open-meteo.com) — weather and city geocoding, no API key
+- [tsParticles](https://particles.js.org) — weather particle effects (lazy-loaded only when the weather theme is on)
 - Web Audio API — session end alarm
-- `localStorage` — persist todos, settings, Spotify items, and theme
+- `localStorage` — persist todos, settings, Spotify items, theme, and cached weather
 - Service Worker — offline support via stale-while-revalidate caching
 
 ## Getting Started

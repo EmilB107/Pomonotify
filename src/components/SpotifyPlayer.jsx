@@ -37,8 +37,7 @@ export function SpotifyPlayer() {
   const [selected, setSelected] = useState(() => loadItems()[0])
   const [showAdd, setShowAdd] = useState(false)
   const [url, setUrl] = useState('')
-  const [pendingName, setPendingName] = useState('')
-  const [fetching, setFetching] = useState(false)
+  const [lookup, setLookup] = useState({ id: null, name: '' })
   const [deleteMode, setDeleteMode] = useState(false)
   const { toasts, toast } = useToast()
   const btnRefs = useRef({})
@@ -51,9 +50,9 @@ export function SpotifyPlayer() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
   }, [items])
 
-  // Fetch names for any item missing one
+  // Fetch names for any saved item missing one
   useEffect(() => {
-    items.forEach(item => {
+    loadItems().forEach(item => {
       if (item.name) return
       fetchName(item.type, item.id)
         .then(name => setItems(prev => prev.map(p => p.id === item.id ? { ...p, name } : p)))
@@ -61,16 +60,19 @@ export function SpotifyPlayer() {
     })
   }, [])
 
-  // Auto-fetch name when URL changes
+  // Auto-fetch name when the pasted URL changes
+  const { type: urlType, id: urlId } = parseSpotifyUrl(url.trim()) ?? {}
+  const pendingName = urlId && lookup.id === urlId ? lookup.name : ''
+  const fetching = !!urlId && lookup.id !== urlId
+
   useEffect(() => {
-    const parsed = parseSpotifyUrl(url.trim())
-    if (!parsed) { setPendingName(''); return }
-    setFetching(true)
-    fetchName(parsed.type, parsed.id)
-      .then(setPendingName)
-      .catch(() => setPendingName(''))
-      .finally(() => setFetching(false))
-  }, [url])
+    if (!urlId) return
+    let cancelled = false
+    fetchName(urlType, urlId)
+      .catch(() => '')
+      .then(name => { if (!cancelled) setLookup({ id: urlId, name }) })
+    return () => { cancelled = true }
+  }, [urlType, urlId])
 
   function removeItem(id) {
     const remaining = items.filter(i => i.id !== id)
@@ -90,7 +92,6 @@ export function SpotifyPlayer() {
     setItems(prev => [...prev, item])
     setSelected(item)
     setUrl('')
-    setPendingName('')
     setShowAdd(false)
   }
 

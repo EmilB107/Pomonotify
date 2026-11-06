@@ -12,12 +12,30 @@ function readCache() {
   }
 }
 
+const POSITION_KEY = 'pomonotify-last-position'
+
+const GEO_ERRORS = {
+  1: 'Location permission denied',
+  2: 'Location unavailable',
+  3: 'Location timed out',
+}
+
+// Falls back to the last known position when the browser can't get a fix (but not when permission is denied).
 function getPosition() {
   return new Promise((resolve, reject) => {
     if (!navigator.geolocation) return reject(new Error('Geolocation unavailable'))
     navigator.geolocation.getCurrentPosition(
-      pos => resolve({ lat: pos.coords.latitude, lon: pos.coords.longitude }),
-      err => reject(err),
+      pos => {
+        const coords = { lat: pos.coords.latitude, lon: pos.coords.longitude }
+        try { localStorage.setItem(POSITION_KEY, JSON.stringify(coords)) } catch { /* ignore */ }
+        resolve(coords)
+      },
+      err => {
+        let last = null
+        try { last = JSON.parse(localStorage.getItem(POSITION_KEY)) } catch { /* ignore */ }
+        if (err.code !== 1 && last) resolve(last)
+        else reject(new Error(GEO_ERRORS[err.code] ?? 'Location unavailable'))
+      },
       { maximumAge: 60 * 60 * 1000, timeout: 10000 },
     )
   })
@@ -30,6 +48,30 @@ async function geocodeCity(city) {
   const hit = data.results?.[0]
   if (!hit) throw new Error(`City "${city}" not found`)
   return { lat: hit.latitude, lon: hit.longitude, place: hit.name }
+}
+
+const PLACE_CACHE_KEY = 'pomonotify-place'
+
+// Open-Meteo has no reverse geocoding, so the city name comes from BigDataCloud's free client-side endpoint.
+// Cached per ~1 km grid cell so it's only looked up again after you move.
+async function reverseGeocode(lat, lon) {
+  const cell = `${lat.toFixed(2)},${lon.toFixed(2)}`
+  try {
+    const cached = JSON.parse(localStorage.getItem(PLACE_CACHE_KEY))
+    if (cached?.cell === cell) return cached.place
+  } catch { /* ignore */ }
+
+  try {
+    const res = await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`)
+    if (!res.ok) throw new Error()
+    const d = await res.json()
+    const place = d.city || d.locality || d.principalSubdivision
+    if (!place) throw new Error()
+    try { localStorage.setItem(PLACE_CACHE_KEY, JSON.stringify({ cell, place })) } catch { /* ignore */ }
+    return place
+  } catch {
+    return 'Your location'
+  }
 }
 
 async function fetchCurrent(lat, lon) {
@@ -67,14 +109,17 @@ export function useWeather({ enabled, source, city }) {
         ;({ lat, lon, place } = await geocodeCity(city.trim()))
       } else {
         ;({ lat, lon } = await getPosition())
-        place = 'Your location'
       }
-      const current = await fetchCurrent(lat, lon)
+      const [current, resolvedPlace] = await Promise.all([
+        fetchCurrent(lat, lon),
+        place ?? reverseGeocode(lat, lon),
+      ])
+      place = resolvedPlace
       const next = { ...current, place, sourceKey, fetchedAt: Date.now() }
       try { localStorage.setItem(CACHE_KEY, JSON.stringify(next)) } catch { /* ignore */ }
       setState({ status: 'ready', ...next })
     } catch (err) {
-      const message = err?.code === 1 ? 'Location permission denied' : (err?.message || 'Weather unavailable')
+      const message = err?.message || 'Weather unavailable'
       setState(s => ({ ...s, status: s.status === 'ready' && s.sourceKey === sourceKey ? 'ready' : 'error', error: message }))
     }
   }, [source, city, sourceKey])
