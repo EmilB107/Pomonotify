@@ -6,6 +6,7 @@ export const DEFAULTS = {
   longBreak: 15,
   autoStart: false,
   notifications: false,
+  customSeconds: 0,
   weatherTheme: false,
   weatherAutoDark: false,
   weatherSource: 'geo',

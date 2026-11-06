@@ -7,6 +7,7 @@ import { Modal } from './components/Modal'
 import { TodoList } from './components/TodoList'
 import { SpotifyPlayer } from './components/SpotifyPlayer'
 import { Settings } from './components/Settings'
+import { CustomTimerPicker } from './components/CustomTimerPicker'
 import { WeatherAmbient } from './components/WeatherAmbient'
 import { WeatherChip } from './components/WeatherChip'
 import { useWeather } from './hooks/useWeather'
@@ -43,6 +44,7 @@ const SHORTCUTS = [
   { key: '1', action: 'Switch to Pomodoro' },
   { key: '2', action: 'Switch to Short Break' },
   { key: '3', action: 'Switch to Long Break' },
+  { key: '4', action: 'Custom timer' },
   { key: 'T', action: 'Add new task' },
   { key: 'S', action: 'Open / Close Settings' },
 ]
@@ -83,12 +85,14 @@ const SESSION_LABELS = {
   pomodoro: 'Pomodoro',
   shortBreak: 'Short Break',
   longBreak: 'Long Break',
+  custom: 'Custom',
 }
 
 const NOTIFICATION_MESSAGES = {
   pomodoro: { title: 'Pomodoro complete!', body: 'Time for a break.' },
   shortBreak: { title: 'Break over!', body: 'Ready to focus?' },
   longBreak: { title: 'Long break over!', body: 'Ready to focus again?' },
+  custom: { title: 'Timer done!', body: 'Your custom timer has finished.' },
 }
 
 function App() {
@@ -96,6 +100,7 @@ function App() {
   const [showSettings, setShowSettings] = useState(false)
   const [showAddTask, setShowAddTask] = useState(false)
   const [showShortcuts, setShowShortcuts] = useState(false)
+  const [showCustomPicker, setShowCustomPicker] = useState(false)
 
   const { settings, update, reset: resetSettings } = useSettings()
 
@@ -121,8 +126,11 @@ function App() {
   }
 
   const {
+    hours,
     minutes,
     seconds,
+    timeLeft,
+    duration,
     isRunning,
     sessionType,
     pomodoroCount,
@@ -132,12 +140,28 @@ function App() {
     resetCycle,
   } = useTimer(settings, handleSessionEnd)
 
+  function handleSessionClick(type) {
+    if (type === 'custom' && sessionType === 'custom') {
+      setShowCustomPicker(v => !v)
+      return
+    }
+    switchSession(type)
+    setShowCustomPicker(type === 'custom')
+  }
+
+  function handleCustomSelect(secs) {
+    update('customSeconds', secs)
+    setIsRunning(false)
+    if (sessionType !== 'custom') switchSession('custom')
+    setShowCustomPicker(false)
+  }
+
   const { todos, activeTask, setActiveTask, addTodo, toggleTodo, deleteTodo, reorderTodos, clearCompleted } = useTodos()
   const activeTaskText = todos.find(t => t.id === activeTask)?.text
 
   useEffect(() => {
-    document.title = `${SESSION_LABELS[sessionType]} · ${minutes}:${seconds} | Pomonotify`
-  }, [minutes, seconds, sessionType])
+    document.title = `${SESSION_LABELS[sessionType]} · ${hours ? `${hours}:` : ''}${minutes}:${seconds} | Pomonotify`
+  }, [hours, minutes, seconds, sessionType])
 
   const [announcement, setAnnouncement] = useState('')
   const isFirstSession = useRef(true)
@@ -151,21 +175,23 @@ function App() {
       if (showShortcuts) return
       const tag = document.activeElement?.tagName
       if (tag === 'INPUT' || tag === 'TEXTAREA') return
+      if (e.key === 'Escape') { setShowCustomPicker(false); return }
       if (showSettings) {
         if (e.key === 's' || e.key === 'S') setShowSettings(false)
         return
       }
 
-      if (e.key === ' ') { e.preventDefault(); setIsRunning(r => !r) }
-      else if (e.key === '1') switchSession('pomodoro')
-      else if (e.key === '2') switchSession('shortBreak')
-      else if (e.key === '3') switchSession('longBreak')
+      if (e.key === ' ') { e.preventDefault(); if (duration > 0) setIsRunning(r => !r) }
+      else if (e.key === '1') handleSessionClick('pomodoro')
+      else if (e.key === '2') handleSessionClick('shortBreak')
+      else if (e.key === '3') handleSessionClick('longBreak')
+      else if (e.key === '4') handleSessionClick('custom')
       else if (e.key === 't' || e.key === 'T') { e.preventDefault(); setShowAddTask(true) }
       else if (e.key === 's' || e.key === 'S') setShowSettings(v => !v)
     }
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [setIsRunning, switchSession, showShortcuts, showSettings])
+  })
 
   return (
     <div className={`mood-root ${effectiveDark ? 'dark' : ''}`} style={moodVars(weather.mood)}>
@@ -211,12 +237,17 @@ function App() {
                   variant={sessionType === type ? 'primary' : 'ghost'}
                   size="none"
                   className="px-3 py-1.5 text-xs min-h-9 sm:px-9 sm:py-3 sm:text-sm sm:min-h-11"
-                  onClick={() => switchSession(type)}
+                  onClick={() => handleSessionClick(type)}
+                  aria-expanded={type === 'custom' ? showCustomPicker : undefined}
                 >
                   {label}
                 </Button>
               ))}
             </div>
+
+            {showCustomPicker && (
+              <CustomTimerPicker value={settings.customSeconds} onSelect={handleCustomSelect} />
+            )}
 
             {/* Timer with progress ring */}
             <div className="relative w-56 h-56 sm:w-80 sm:h-80 flex items-center justify-center">
@@ -231,11 +262,12 @@ function App() {
                   strokeWidth="3"
                   strokeLinecap="round"
                   strokeDasharray={RING_C}
-                  strokeDashoffset={RING_C * (1 - (parseInt(minutes) * 60 + parseInt(seconds)) / (settings[sessionType] * 60))}
+                  strokeDashoffset={duration > 0 ? RING_C * (1 - timeLeft / duration) : RING_C}
                   style={{ transition: 'stroke-dashoffset 1s linear' }}
                 />
               </svg>
               <span className="text-[3rem] sm:text-[4.5rem] leading-none font-light tabular-nums tracking-tight select-none">
+                {hours && <span>{hours}:</span>}
                 <span key={minutes} className="animate-digit-in inline-block">{minutes}</span>
                 <span>:</span>
                 <span>{seconds}</span>
@@ -267,7 +299,7 @@ function App() {
 
             {/* Controls */}
             <div className="flex items-center gap-4">
-              <Button variant="primary" size="md" onClick={() => setIsRunning(r => !r)}>
+              <Button variant="primary" size="md" onClick={() => setIsRunning(r => !r)} disabled={duration === 0} className="disabled:opacity-40 disabled:cursor-not-allowed">
                 {isRunning ? 'Pause' : 'Start'}
               </Button>
               <Button variant="ghost" size="md" onClick={reset}>

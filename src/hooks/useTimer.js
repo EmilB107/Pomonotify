@@ -5,6 +5,7 @@ function toSeconds(settings) {
     pomodoro: settings.pomodoro * 60,
     shortBreak: settings.shortBreak * 60,
     longBreak: settings.longBreak * 60,
+    custom: settings.customSeconds,
   }
 }
 
@@ -33,7 +34,7 @@ export function useTimer(settings, onSessionEnd) {
     if (!isRunningRef.current) {
       setTimeLeft(toSeconds(settings)[sessionTypeRef.current])
     }
-  }, [settings.pomodoro, settings.shortBreak, settings.longBreak])
+  }, [settings.pomodoro, settings.shortBreak, settings.longBreak, settings.customSeconds])
 
   useEffect(() => {
     if (isRunning) {
@@ -54,7 +55,7 @@ export function useTimer(settings, onSessionEnd) {
   }, [isRunning, sessionType])
 
   useEffect(() => {
-    if (timeLeft !== 0 || sessionEndFiredRef.current) return
+    if (timeLeft !== 0 || sessionEndFiredRef.current || !isRunningRef.current) return
     sessionEndFiredRef.current = true
 
     const currentSession = sessionTypeRef.current
@@ -63,6 +64,12 @@ export function useTimer(settings, onSessionEnd) {
     new Audio('/sounds/beep.mp3').play().catch(() => {})
     onSessionEndRef.current?.(currentSession)
 
+    if (currentSession === 'custom') {
+      setIsRunning(false)
+      setTimeLeft(s.customSeconds)
+      return
+    }
+
     const nextCount = currentSession === 'pomodoro' ? pomodoroCountRef.current + 1 : pomodoroCountRef.current
     const nextSession = currentSession === 'pomodoro'
       ? (nextCount % 4 === 0 ? 'longBreak' : 'shortBreak')
@@ -70,7 +77,7 @@ export function useTimer(settings, onSessionEnd) {
     setPomodoroCount(nextCount)
     setSessionType(nextSession)
     setTimeLeft(toSeconds(s)[nextSession])
-    if (s.autoStart) setIsRunning(true)
+    setIsRunning(s.autoStart)
   }, [timeLeft])
 
   function switchSession(type) {
@@ -88,8 +95,10 @@ export function useTimer(settings, onSessionEnd) {
     setPomodoroCount(0)
   }
 
-  const minutes = String(Math.floor(timeLeft / 60)).padStart(2, '0')
+  const duration = toSeconds(settings)[sessionType]
+  const hours = duration >= 3600 ? String(Math.floor(timeLeft / 3600)) : null
+  const minutes = String(Math.floor((hours ? timeLeft % 3600 : timeLeft) / 60)).padStart(2, '0')
   const seconds = String(timeLeft % 60).padStart(2, '0')
 
-  return { minutes, seconds, isRunning, sessionType, pomodoroCount, setIsRunning, switchSession, reset, resetCycle }
+  return { hours, minutes, seconds, timeLeft, duration, isRunning, sessionType, pomodoroCount, setIsRunning, switchSession, reset, resetCycle }
 }
