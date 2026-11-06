@@ -13,6 +13,11 @@
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@tsparticles/basic": "^4.5.2",
+    "@tsparticles/engine": "^4.5.2",
+    "@tsparticles/react": "^4.5.2",
+    "@tsparticles/shape-line": "^4.5.2",
+    "@tsparticles/updater-rotate": "^4.5.2",
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },

@@ -1,8 +1,31 @@
 import { useState } from 'react'
 import { Button, SectionLabel } from './Button'
 import { Modal } from './Modal'
+import { DEFAULTS } from '../hooks/useSettings'
 
-const DEFAULTS = { pomodoro: 25, shortBreak: 5, longBreak: 15, autoStart: false, notifications: false }
+function Segmented({ label, value, options, onChange }) {
+  return (
+    <div className="flex items-center justify-between py-1 gap-3">
+      <span className="text-sm" id={`seg-${label}`}>{label}</span>
+      <div role="radiogroup" aria-labelledby={`seg-${label}`} className="flex bg-black/5 dark:bg-white/10 rounded-full p-0.5">
+        {options.map(([val, text]) => (
+          <button
+            key={val}
+            type="button"
+            role="radio"
+            aria-checked={value === val}
+            onClick={() => onChange(val)}
+            className={`px-3 py-1 text-xs rounded-full transition-colors ${
+              value === val ? 'bg-accent-strong text-white font-semibold' : 'text-[#666] dark:text-[#aaa]'
+            }`}
+          >
+            {text}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
 
 function DurationField({ label, value, onChange, min = 1, max = 99 }) {
   return (
@@ -36,13 +59,14 @@ function Toggle({ label, checked, onChange }) {
       <button
         type="button"
         role="switch"
+        aria-label={label}
         aria-checked={checked}
         onClick={() => onChange(!checked)}
         className={`relative w-10 h-6 rounded-full transition-colors ${
-          checked ? 'bg-[#52796f]' : 'bg-black/15 dark:bg-white/15'
+          checked ? 'bg-accent-strong' : 'bg-black/15 dark:bg-white/15'
         }`}
       >
-        <span className={`absolute top-1 w-4 h-4 bg-white rounded-full shadow transition-transform ${
+        <span className={`absolute top-1 left-0 w-4 h-4 bg-white rounded-full shadow transition-transform ${
           checked ? 'translate-x-5' : 'translate-x-1'
         }`} />
       </button>
@@ -89,6 +113,38 @@ export function Settings({ settings, update, onClose }) {
         <p className="text-xs text-[#666] dark:text-[#aaa] mb-1">Behavior</p>
         <Toggle label="Auto-start next session" checked={draft.autoStart} onChange={v => set('autoStart', v)} />
         <Toggle label="Browser notifications" checked={draft.notifications} onChange={handleNotificationsToggle} />
+      </div>
+
+      <div className="flex flex-col gap-1">
+        <p className="text-xs text-[#666] dark:text-[#aaa] mb-1">Weather</p>
+        <Toggle label="Weather-reactive theme" checked={draft.weatherTheme} onChange={v => set('weatherTheme', v)} />
+        {draft.weatherTheme && (
+          <>
+            <Toggle label="Dark mode follows day/night" checked={draft.weatherAutoDark} onChange={v => set('weatherAutoDark', v)} />
+            <Segmented
+              label="Location"
+              value={draft.weatherSource}
+              options={[['geo', 'My location'], ['city', 'City']]}
+              onChange={v => set('weatherSource', v)}
+            />
+            {draft.weatherSource === 'city' && (
+              <input
+                type="text"
+                aria-label="City"
+                placeholder="e.g. Manila"
+                value={draft.weatherCity}
+                onChange={e => set('weatherCity', e.target.value)}
+                className="mt-1 w-full text-sm bg-black/5 dark:bg-white/5 rounded-2xl px-4 py-2.5 outline-none placeholder:text-[#666] dark:placeholder:text-[#aaa] focus:ring-1 focus:ring-accent-strong dark:focus:ring-accent-soft"
+              />
+            )}
+            <Segmented
+              label="Units"
+              value={draft.weatherUnit}
+              options={[['c', '°C'], ['f', '°F']]}
+              onChange={v => set('weatherUnit', v)}
+            />
+          </>
+        )}
       </div>
 
       <div className="flex items-center justify-between">

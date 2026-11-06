@@ -1,11 +1,16 @@
 import { useState, useEffect } from 'react'
 
-const DEFAULTS = {
+export const DEFAULTS = {
   pomodoro: 25,
   shortBreak: 5,
   longBreak: 15,
   autoStart: false,
   notifications: false,
+  weatherTheme: false,
+  weatherAutoDark: false,
+  weatherSource: 'geo',
+  weatherCity: '',
+  weatherUnit: 'c',
 }
 
 export function useSettings() {

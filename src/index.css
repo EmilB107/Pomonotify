@@ -2,6 +2,14 @@
 
 @custom-variant dark (&:is(.dark *));
 
+@theme inline {
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-strong-hover: var(--accent-strong-hover);
+  --color-accent-soft: var(--accent-soft);
+  --color-mood-bg-light: var(--bg-light);
+  --color-mood-bg-dark: var(--bg-dark);
+}
+
 @theme {
   --color-accent: #84a98c;
   --color-accent-hover: #6b9474;
@@ -58,7 +66,34 @@ body {
   to   { opacity: 1; transform: scale(1)    translateY(0); }
 }
 
+@keyframes lightning {
+  0%   { opacity: 0; }
+  4%   { opacity: 0.35; }
+  8%   { opacity: 0.05; }
+  12%  { opacity: 0.25; }
+  30%  { opacity: 0; }
+  100% { opacity: 0; }
+}
+
+@keyframes sun-pulse {
+  0%, 100% { transform: scale(1);    }
+  50%      { transform: scale(1.08); }
+}
+
+/* Smoothly cross-fade mood colors */
+@property --accent-strong { syntax: '<color>'; inherits: true; initial-value: #52796f; }
+@property --accent-strong-hover { syntax: '<color>'; inherits: true; initial-value: #3f6256; }
+@property --accent-soft { syntax: '<color>'; inherits: true; initial-value: #84a98c; }
+@property --bg-light { syntax: '<color>'; inherits: true; initial-value: #f5f5f0; }
+@property --bg-dark { syntax: '<color>'; inherits: true; initial-value: #1a1a1a; }
+
+.mood-root {
+  transition: --accent-strong 0.8s ease, --accent-strong-hover 0.8s ease, --accent-soft 0.8s ease, --bg-light 0.8s ease, --bg-dark 0.8s ease;
+}
+
 @layer utilities {
+  .animate-lightning { animation: lightning 1.4s ease-out both; }
+  .animate-sun-pulse { animation: sun-pulse 12s ease-in-out infinite; }
   .animate-backdrop-in { animation: backdrop-in 0.15s ease-out both; }
   .animate-modal-in    { animation: modal-in    0.2s  ease-out both; }
 }

@@ -54,7 +54,7 @@ function SortableItem({ todo, activeTask, setActiveTask, onToggle, deleteMode, s
             ? 'bg-red-400/10 cursor-pointer'
             : 'hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer'
           : activeTask === todo.id
-            ? 'bg-[#84a98c]/10 cursor-pointer'
+            ? 'bg-accent-soft/10 cursor-pointer'
             : 'hover:bg-black/5 dark:hover:bg-white/5 cursor-pointer'
       }`}
       onClick={() => deleteMode
@@ -79,7 +79,7 @@ function SortableItem({ todo, activeTask, setActiveTask, onToggle, deleteMode, s
           type="button"
           onClick={e => { e.stopPropagation(); onToggle(todo.id) }}
           className={`w-5 h-5 rounded-full border-2 flex-shrink-0 flex items-center justify-center transition-colors cursor-pointer ${
-            todo.completed ? 'bg-[#52796f] border-[#52796f]' : 'border-black/20 dark:border-white/20 hover:border-[#52796f]'
+            todo.completed ? 'bg-accent-strong border-accent-strong' : 'border-black/20 dark:border-white/20 hover:border-accent-strong'
           }`}
         >
           {todo.completed && (
@@ -96,7 +96,7 @@ function SortableItem({ todo, activeTask, setActiveTask, onToggle, deleteMode, s
           : todo.completed
             ? 'line-through text-[#666] dark:text-[#777]'
             : activeTask === todo.id
-              ? 'text-[#52796f] dark:text-[#84a98c] font-medium'
+              ? 'text-accent-strong dark:text-accent-soft font-medium'
               : 'text-[#1a1a1a] dark:text-[#e8e8e8]'
       }`}>
         {todo.text}
@@ -202,7 +202,7 @@ export function TodoList({ todos, activeTask, setActiveTask, addTodo, toggleTodo
             <button
               type="button"
               onClick={toggleSelectAll}
-              className="text-xs text-[#666] dark:text-[#aaa] hover:text-[#52796f] dark:hover:text-[#84a98c] transition-colors"
+              className="text-xs text-[#666] dark:text-[#aaa] hover:text-accent-strong dark:hover:text-accent-soft transition-colors"
             >
               {allSelected ? 'Deselect all' : 'Select all'}
             </button>
@@ -234,7 +234,7 @@ export function TodoList({ todos, activeTask, setActiveTask, addTodo, toggleTodo
         <div className="flex flex-col gap-2">
           <input
             autoFocus
-            className="w-full text-sm bg-black/5 dark:bg-white/5 rounded-2xl px-4 py-3 outline-none placeholder:text-[#666] dark:placeholder:text-[#aaa] focus:ring-1 focus:ring-[#52796f] dark:focus:ring-[#84a98c] transition-all"
+            className="w-full text-sm bg-black/5 dark:bg-white/5 rounded-2xl px-4 py-3 outline-none placeholder:text-[#666] dark:placeholder:text-[#aaa] focus:ring-1 focus:ring-accent-strong dark:focus:ring-accent-soft transition-all"
             placeholder="Add a task..."
             value={input}
             onChange={e => setInput(e.target.value)}

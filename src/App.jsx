@@ -7,6 +7,10 @@ import { Modal } from './components/Modal'
 import { TodoList } from './components/TodoList'
 import { SpotifyPlayer } from './components/SpotifyPlayer'
 import { Settings } from './components/Settings'
+import { WeatherAmbient } from './components/WeatherAmbient'
+import { WeatherChip } from './components/WeatherChip'
+import { useWeather } from './hooks/useWeather'
+import { moodVars, MOODS } from './lib/weatherMoods'
 
 function SunIcon() {
   return (
@@ -95,6 +99,20 @@ function App() {
 
   const { settings, update, reset: resetSettings } = useSettings()
 
+  const weather = useWeather({
+    enabled: settings.weatherTheme,
+    source: settings.weatherSource,
+    city: settings.weatherCity,
+  })
+  const followDayNight = settings.weatherTheme && settings.weatherAutoDark && weather.isDay != null
+  const effectiveDark = followDayNight ? !weather.isDay : isDark
+
+  useEffect(() => {
+    const m = MOODS[weather.mood] ?? MOODS.default
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', effectiveDark ? m.bgDark : m.bgLight)
+    document.body.style.backgroundColor = effectiveDark ? m.bgDark : m.bgLight
+  }, [weather.mood, effectiveDark])
+
   function handleSessionEnd(type) {
     if (settings.notifications && Notification.permission === 'granted') {
       const { title, body } = NOTIFICATION_MESSAGES[type]
@@ -131,12 +149,12 @@ function App() {
   useEffect(() => {
     function handleKeyDown(e) {
       if (showShortcuts) return
+      const tag = document.activeElement?.tagName
+      if (tag === 'INPUT' || tag === 'TEXTAREA') return
       if (showSettings) {
         if (e.key === 's' || e.key === 'S') setShowSettings(false)
         return
       }
-      const tag = document.activeElement?.tagName
-      if (tag === 'INPUT' || tag === 'TEXTAREA') return
 
       if (e.key === ' ') { e.preventDefault(); setIsRunning(r => !r) }
       else if (e.key === '1') switchSession('pomodoro')
@@ -150,25 +168,38 @@ function App() {
   }, [setIsRunning, switchSession, showShortcuts, showSettings])
 
   return (
-    <div className={isDark ? 'dark' : ''}>
+    <div className={`mood-root ${effectiveDark ? 'dark' : ''}`} style={moodVars(weather.mood)}>
       <div aria-live="polite" aria-atomic="true" className="sr-only">{announcement}</div>
 
       {/* Full-screen background */}
-      <div className="min-h-screen bg-[#f5f5f0] dark:bg-[#1a1a1a] text-[#1a1a1a] dark:text-[#e8e8e8] transition-colors duration-300 flex flex-col justify-center items-center">
+      <div className="min-h-screen bg-mood-bg-light dark:bg-mood-bg-dark text-[#1a1a1a] dark:text-[#e8e8e8] transition-colors duration-300 flex flex-col justify-center items-center">
+
+        <WeatherAmbient mood={weather.mood} isDark={effectiveDark} wind={weather.wind} />
 
         {/* Centered container */}
-        <main className="w-full max-w-3xl px-4 sm:px-6">
+        <main className="relative z-10 w-full max-w-3xl px-4 sm:px-6">
 
           {/* Timer section */}
           <section className="flex flex-col items-center gap-6 py-12 sm:py-16">
 
             {/* Utility icons */}
-            <div className="flex items-center gap-1 self-end">
+            <div className="flex items-center gap-1 self-stretch justify-end">
+              <WeatherChip weather={weather} unit={settings.weatherUnit} onClick={weather.refresh} />
               <Button size="icon" onClick={() => setShowShortcuts(true)} aria-label="Keyboard shortcuts">
                 <KeyboardIcon />
               </Button>
-              <Button size="icon" onClick={() => setIsDark(d => { localStorage.setItem('theme', d ? 'light' : 'dark'); return !d })} aria-label="Toggle theme">
-                {isDark ? <SunIcon /> : <MoonIcon />}
+              <Button
+                size="icon"
+                onClick={() => {
+                  if (followDayNight) update('weatherAutoDark', false)
+                  const next = !effectiveDark
+                  localStorage.setItem('theme', next ? 'dark' : 'light')
+                  setIsDark(next)
+                }}
+                aria-label="Toggle theme"
+                title={followDayNight ? 'Following day/night — click to override' : 'Toggle theme'}
+              >
+                {effectiveDark ? <SunIcon /> : <MoonIcon />}
               </Button>
             </div>
 
@@ -195,7 +226,8 @@ function App() {
                   key={`${sessionType}-${pomodoroCount}`}
                   cx="100" cy="100" r={RING_R}
                   fill="none"
-                  stroke="#84a98c"
+                  stroke="currentColor"
+                  className="text-accent-soft"
                   strokeWidth="3"
                   strokeLinecap="round"
                   strokeDasharray={RING_C}
@@ -222,7 +254,7 @@ function App() {
                     onClick={resetCycle}
                     aria-label="Reset cycle"
                     title="Reset cycle"
-                    className="text-[#666] dark:text-[#aaa] hover:text-[#52796f] dark:hover:text-[#84a98c] transition-colors"
+                    className="text-[#666] dark:text-[#aaa] hover:text-accent-strong dark:hover:text-accent-soft transition-colors"
                   >
                     <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" />
@@ -252,7 +284,7 @@ function App() {
             {/* Active task */}
             {activeTaskText && (
               <p className="text-base text-[#666] dark:text-[#aaa]">
-                Working on: <span className="text-[#52796f] dark:text-[#84a98c] font-medium">{activeTaskText}</span>
+                Working on: <span className="text-accent-strong dark:text-accent-soft font-medium">{activeTaskText}</span>
               </p>
             )}
 

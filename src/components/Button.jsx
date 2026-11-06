@@ -5,7 +5,7 @@ export const Button = forwardRef(function Button({ variant = 'ghost', size = 'md
 
   const variantClass =
     variant === 'primary'
-      ? 'bg-[#52796f] hover:bg-[#3f6256] text-white font-semibold'
+      ? 'bg-accent-strong hover:bg-accent-strong-hover text-white font-semibold'
       : 'text-[#666666] dark:text-[#aaaaaa] hover:bg-black/5 dark:hover:bg-white/5'
 
   const sizeClass =
