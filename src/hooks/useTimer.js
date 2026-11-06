@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { playSound } from '../lib/sounds'
 
 function toSeconds(settings) {
   return {
@@ -66,7 +67,7 @@ export function useTimer(settings, onSessionEnd) {
     const currentSession = sessionTypeRef.current
     const s = settingsRef.current
 
-    new Audio('/sounds/beep.mp3').play().catch(() => {})
+    playSound(s.sound)
     onSessionEndRef.current?.(currentSession)
 
     if (currentSession === 'custom') {

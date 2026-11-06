@@ -6,6 +6,8 @@ export const DEFAULTS = {
   longBreak: 15,
   autoStart: false,
   notifications: false,
+  sound: 'beep',
+  customSoundName: '',
   customSeconds: 0,
   weatherTheme: false,
   weatherAutoDark: false,
